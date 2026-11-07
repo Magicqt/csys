@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="南山饮食烹饪技法完整版，包含过油、老火水、老火油、二次调味、和面、五行汤、老火汤等八大技法详解">
     <title>南山饮食烹饪技法</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Microsoft YaHei", "SimSun", serif;
+            font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -17,6 +22,25 @@
             color: #3d3528;
             line-height: 1.9;
             padding: 20px;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* 夜间模式 */
+        body.dark {
+            background: #1a1a1a;
+            color: #d4cfc4;
+        }
+
+        /* 阅读进度条 */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(to right, #6d8f60, #a77d53);
+            width: 0%;
+            z-index: 1000;
+            transition: width 0.1s ease;
         }
 
         .container {
@@ -26,31 +50,112 @@
             border-radius: 12px;
             box-shadow: 0 4px 25px rgba(0,0,0,0.08);
             overflow: hidden;
+            transition: background 0.3s ease;
+        }
+
+        body.dark .container {
+            background: #2a2a2a;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.3);
         }
 
         .header {
-            background: linear-gradient(to right, #6d8f60, #a77d53);
+            background: linear-gradient(135deg, #5a7d50 0%, #6d8f60 30%, #8c7550 70%, #a77d53 100%);
             color: #fff;
             text-align: center;
-            padding: 30px 20px;
+            padding: 35px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
 
         .header h1 {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: normal;
+            position: relative;
+            z-index: 1;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .tab-group {
+        /* 工具栏 */
+        .toolbar {
             display: flex;
-            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 10px 20px;
             background: #f9f6f1;
             border-bottom: 1px solid #eee;
+            transition: background 0.3s ease;
+        }
+
+        body.dark .toolbar {
+            background: #333;
+            border-bottom-color: #444;
+        }
+
+        .tool-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+
+        .tool-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        body.dark .tool-btn {
+            background: #444;
+            color: #fff;
+        }
+
+        /* 标签导航 - 横向滚动 */
+        .tab-group {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            background: #f9f6f1;
+            border-bottom: 1px solid #eee;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+
+        body.dark .tab-group {
+            background: #333;
+            border-bottom-color: #444;
+        }
+
+        .tab-group::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .tab-group::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.15);
+            border-radius: 2px;
         }
 
         .tab {
-            flex: 1;
-            min-width: 120px;
-            padding: 16px 10px;
+            flex: 0 0 auto;
+            min-width: 110px;
+            padding: 16px 18px;
             text-align: center;
             cursor: pointer;
             font-weight: bold;
@@ -58,6 +163,7 @@
             border: none;
             background: transparent;
             font-size: 15px;
+            white-space: nowrap;
         }
 
         /* 五行雅致配色 */
@@ -70,16 +176,27 @@
         .tab:nth-child(7) { background: #f0f8f7; color: #2f7d72; }
         .tab:nth-child(8) { background: #f2f2f2; color: #444; }
 
+        body.dark .tab:nth-child(1) { background: #2d3d2e; color: #7ba87f; }
+        body.dark .tab:nth-child(2) { background: #3d2d2c; color: #c97870; }
+        body.dark .tab:nth-child(3) { background: #3d3524; color: #c9a060; }
+        body.dark .tab:nth-child(4) { background: #24303d; color: #7098c9; }
+        body.dark .tab:nth-child(5) { background: #2e2a3d; color: #9485c9; }
+        body.dark .tab:nth-child(6) { background: #3d2a35; color: #c978a8; }
+        body.dark .tab:nth-child(7) { background: #243835; color: #60b0a0; }
+        body.dark .tab:nth-child(8) { background: #333; color: #aaa; }
+
         .tab.active {
-            filter: brightness(1.15);
-            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.15);
+            filter: brightness(1.1);
+            box-shadow: inset 0 -4px 0 currentColor;
+            font-size: 16px;
         }
 
         .content {
-            padding: 40px 45px;
+            padding: 30px 40px;
             display: none;
             min-height: 600px;
             white-space: pre-line;
+            transition: padding 0.3s ease;
         }
 
         .content.active {
@@ -94,22 +211,40 @@
 
         .content h2 {
             color: #8c6a3d;
-            margin: 0 0 20px 0;
+            margin: 0 0 25px 0;
             font-size: 24px;
             border-left: 5px solid #c8a874;
             padding-left: 15px;
         }
 
+        body.dark .content h2 {
+            color: #c8a874;
+        }
+
         .content h3 {
             color: #705a42;
-            margin: 25px 0 12px 0;
+            margin: 28px 0 12px 0;
             font-size: 19px;
+            padding: 10px 15px;
+            background: #faf8f4;
+            border-radius: 6px;
+            border-left: 3px solid #d4b98c;
+        }
+
+        body.dark .content h3 {
+            color: #c0a880;
+            background: #333;
+            border-left-color: #a08860;
         }
 
         .content p {
             font-size: 16px;
             color: #444;
             margin-bottom: 12px;
+        }
+
+        body.dark .content p {
+            color: #ccc;
         }
 
         .content ul, .content ol {
@@ -130,12 +265,120 @@
             font-size: 15px;
             color: #665a47;
         }
+
+        body.dark .tip {
+            background: #333;
+            color: #aaa;
+        }
+
+        /* 回到顶部按钮 */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6d8f60, #a77d53);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+
+        /* 响应式 - 移动端 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 25px 15px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+                letter-spacing: 1px;
+            }
+
+            .content {
+                padding: 20px 18px;
+            }
+
+            .content h2 {
+                font-size: 20px;
+                margin-bottom: 18px;
+            }
+
+            .content h3 {
+                font-size: 17px;
+                margin: 20px 0 10px;
+                padding: 8px 12px;
+            }
+
+            .content p, .content li {
+                font-size: 15px;
+            }
+
+            .tab {
+                min-width: 90px;
+                padding: 14px 12px;
+                font-size: 14px;
+            }
+
+            .tab.active {
+                font-size: 15px;
+            }
+
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 42px;
+                height: 42px;
+            }
+        }
+
+        /* 字体大小调节 */
+        body.font-small .content p,
+        body.font-small .content li {
+            font-size: 14px;
+        }
+
+        body.font-large .content p,
+        body.font-large .content li {
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
+    <!-- 阅读进度条 -->
+    <div class="progress-bar" id="progressBar"></div>
+
     <div class="container">
         <div class="header">
             <h1>南山饮食烹饪技法（1-25页 完整版）</h1>
+        </div>
+
+        <!-- 工具栏 -->
+        <div class="toolbar">
+            <button class="tool-btn" id="fontDecrease" title="缩小字体">A-</button>
+            <button class="tool-btn" id="fontIncrease" title="放大字体">A+</button>
+            <button class="tool-btn" id="darkModeToggle" title="夜间模式">🌙</button>
         </div>
 
         <!-- 标签导航 -->
@@ -153,7 +396,7 @@
         <!-- 完整内容：一字不漏 1-25页 -->
         <div id="c1" class="content active">
 <h2>过油技法</h2>
-<p>过油就是南山饮食烹饪八法中排名第一的“炸”。之所以排名第一，是因为“炸”是其他技法的前提，同时，技术难度系数也是第一，危险系数也是第一。</p>
+<p>过油就是南山饮食烹饪八法中排名第一的"炸"。之所以排名第一，是因为"炸"是其他技法的前提，同时，技术难度系数也是第一，危险系数也是第一。</p>
 
 <h3>（一）油量把控</h3>
 <p>油量要是过油食材的两倍以上，既保证过油过程中的从容操作，也防止食材入锅后油温下降太快，影响过油的效果。</p>
@@ -180,10 +423,10 @@
 <h2>老火水（熟水）制备</h2>
 <p>烹饪过程所需的老火水，需要提前制备。家庭使用按每人2只保温瓶配置，熬制好的老火水装入保温瓶（留五分之一的空间不要灌满），静置5小时以上使用更佳。</p>
 
-<p>开水会在瓶内上下流转，在空间部分凝结成“天水”，这时水在瓶里的状态与水在我们体内的状态相似，喝这样的水也是“同气相求、同声相应”，这样的水就是李时珍所说的“天水”，烹饪时用效果更是“如虎添翼”。</p>
+<p>开水会在瓶内上下流转，在空间部分凝结成"天水"，这时水在瓶里的状态与水在我们体内的状态相似，喝这样的水也是"同气相求、同声相应"，这样的水就是李时珍所说的"天水"，烹饪时用效果更是"如虎添翼"。</p>
 
 <h3>示例：南山饮食——老火水</h3>
-<p>老火水也称“熟水”，是南山饮食五虎将之首，地位和作用显而易见。南山饮食体系要对水进行预处理，通过火候的累积，从量变到质变，经历“生、熟、香、划、和”次第转变，使得水性圆满转换。</p>
+<p>老火水也称"熟水"，是南山饮食五虎将之首，地位和作用显而易见。南山饮食体系要对水进行预处理，通过火候的累积，从量变到质变，经历"生、熟、香、划、和"次第转变，使得水性圆满转换。</p>
 
 <h3>（一）食材表</h3>
 <p>主料：净水5升（下限）。</p>
@@ -205,7 +448,7 @@
 <h2>老火油制备</h2>
 <p>烹饪用油是厨房的日常必备。不同的食品烹饪时，对初始油温的要求不尽相同。厨者对油温的感知和把握，短时间内不易到位，致使多数人在烹饪时油温不够，容易造成最终食品的油脂成分熟度不够，不但食物口感黏腻，而且难以消化。</p>
 
-<p>老火油是南山饮食的五虎将之一，排名第二，可见地位之高，作用之大。南山饮食体系对食用油要进行预处理，通过火候的累积，经历“生、熟、香、划、和”次第转变，使得油品圆满转性。这样我们在烹饪食品时，只需把老火油加热到所需油温，此后即可从容操作了。</p>
+<p>老火油是南山饮食的五虎将之一，排名第二，可见地位之高，作用之大。南山饮食体系对食用油要进行预处理，通过火候的累积，经历"生、熟、香、划、和"次第转变，使得油品圆满转性。这样我们在烹饪食品时，只需把老火油加热到所需油温，此后即可从容操作了。</p>
 
 <h3>示例：南山饮食——老火油</h3>
 <h3>（一）食材表</h3>
@@ -228,27 +471,27 @@
 
         <div id="c4" class="content">
 <h2>二次调味法</h2>
-<p>烹饪过程中采用“二次调味法”。</p>
+<p>烹饪过程中采用"二次调味法"。</p>
 
 <h3>（一）一次调底味</h3>
-<p>在食材断生之后，加入盐、酱油等佐料的三分之二调味后继续烹饪，这时调味能够让火力把味道压入食材内部，涵养于内，最终形成食品的底味，也称回味。食者进食后，感到“回味悠长”的回味即来自于此。</p>
+<p>在食材断生之后，加入盐、酱油等佐料的三分之二调味后继续烹饪，这时调味能够让火力把味道压入食材内部，涵养于内，最终形成食品的底味，也称回味。食者进食后，感到"回味悠长"的回味即来自于此。</p>
 
 <h3>（二）二次调口味</h3>
-<p>在起锅前加入剩余的佐料，并加入花椒油（辣椒油随意）、香菜等。这时的调味能够让味道彰显于外，成为食品的口味，也称风味。食者进食后，感到“口感惊艳”即来源于此。</p>
+<p>在起锅前加入剩余的佐料，并加入花椒油（辣椒油随意）、香菜等。这时的调味能够让味道彰显于外，成为食品的口味，也称风味。食者进食后，感到"口感惊艳"即来源于此。</p>
 
 <h3>（三）调味的佐料</h3>
 <p>调味的佐料主要是食盐和酱油。食盐种类众多，有海盐、湖盐、土盐、井盐、岩盐等，南山饮食建议使用西北地区的湖盐。</p>
 
-<p>对酱油的选择：如果能获得如法制作的传统酱油最好，否则，可以用市售的味极鲜酱油和老抽酱油配合使用。无论哪种酱油，建议按照以下示例的方法，加工成“老火酱汁”后使用。</p>
+<p>对酱油的选择：如果能获得如法制作的传统酱油最好，否则，可以用市售的味极鲜酱油和老抽酱油配合使用。无论哪种酱油，建议按照以下示例的方法，加工成"老火酱汁"后使用。</p>
 
 <p>底味和口味表里相依，相得益彰，共同成就食品的绚丽生命。</p>
 
 <p>说明：南山饮食烹饪很少用到醋，原因是很难找到传统工艺制作且适合南山饮食体系的醋（窖藏10年以上的老陈醋），故此宁缺毋滥。如果有这种品质的醋，但用无妨。</p>
 
 <h3>示例：南山饮食——老火酱汁</h3>
-<p>老火酱汁是南山饮食的五虎将之一，烹调时必备的佐料，是佐料中的“国老”。</p>
+<p>老火酱汁是南山饮食的五虎将之一，烹调时必备的佐料，是佐料中的"国老"。</p>
 
-<p>酱油是发酵的佐料，五行属水性寒，一般烹饪难以转性。南山饮食通过火候、佐料的配合，加之制作程序的调整，可以将其“偏性”转变为“和性”，口感温和，性状稳定，使用灵动。</p>
+<p>酱油是发酵的佐料，五行属水性寒，一般烹饪难以转性。南山饮食通过火候、佐料的配合，加之制作程序的调整，可以将其"偏性"转变为"和性"，口感温和，性状稳定，使用灵动。</p>
 
 <h3>（一）食材表</h3>
 <p>主料：传统酱油5升。
@@ -275,11 +518,11 @@
 
         <div id="c5" class="content">
 <h2>五体和面法——非发酵类</h2>
-<p>非发酵类面食是用盐、水与小麦粉共同作用后，按照“五体和面法”制作的面食。</p>
+<p>非发酵类面食是用盐、水与小麦粉共同作用后，按照"五体和面法"制作的面食。</p>
 
-<p>南山饮食的非发酵类面食制作，秉持南山饮食“再造生命”的基本理念，根据中医五行理论进行操作。五行理论中，与“木、火、土、金、水”五行相对应的“五体”，是“筋、脉、肉、皮、骨”。南山饮食认为，生命之初是从“水”开始的，故面食制作从“骨”开始，依次是搭骨架、连筋、生脉、练肉、长肌肤。</p>
+<p>南山饮食的非发酵类面食制作，秉持南山饮食"再造生命"的基本理念，根据中医五行理论进行操作。五行理论中，与"木、火、土、金、水"五行相对应的"五体"，是"筋、脉、肉、皮、骨"。南山饮食认为，生命之初是从"水"开始的，故面食制作从"骨"开始，依次是搭骨架、连筋、生脉、练肉、长肌肤。</p>
 
-<p>经过以上五个步骤的操作，面粉已经从食材转化到半成品，完成第一个“生、熟、香、划、和”的提升，此处的生是“生熟”的生；第二次提升是厨者制作面剂的过程，完成第二个“生、熟、香、划、和”，此处的生是“生发”的生；第三次提升是下锅烹饪的过程，完成第三个“生、熟、香、划、和”，此处的生是“生命”的生，意味着又一个新生命的诞生。</p>
+<p>经过以上五个步骤的操作，面粉已经从食材转化到半成品，完成第一个"生、熟、香、划、和"的提升，此处的生是"生熟"的生；第二次提升是厨者制作面剂的过程，完成第二个"生、熟、香、划、和"，此处的生是"生发"的生；第三次提升是下锅烹饪的过程，完成第三个"生、熟、香、划、和"，此处的生是"生命"的生，意味着又一个新生命的诞生。</p>
 
 <h3>示例：五体和面法——非发酵面</h3>
 <h3>（一）食材表</h3>
@@ -309,7 +552,7 @@
 （3）生脉
 再用劳宫发力二次揉面，到有充气感后，饧面5～8分钟。
 （4）练肉一次
-此步骤俗称“顺条”。将饧好的面团揉捻成6～7厘米的粗条，抛起后拉伸至4～5厘米，旋转交叉后再拉伸，拉伸后反向旋转交叉。
+此步骤俗称"顺条"。将饧好的面团揉捻成6～7厘米的粗条，抛起后拉伸至4～5厘米，旋转交叉后再拉伸，拉伸后反向旋转交叉。
 2千克以下，交叉旋转4遍；2千克以上旋转5遍。
 然后放入容器，再次饧面5～8分钟。
 （5）练肉二次
@@ -317,12 +560,12 @@
 （6）长肌肤
 用小鱼际向内发力揉面，将前面揉散的面收拢回来，揉成紧致的面团。
 然后在案板上平刷老火油，再将面团光面朝下放置在案板上，用双手按压成1～2厘米厚的面饼（面饼的厚度根据面的多少调整）。
-再用太极的手法仔细揉按面饼，松开面饼的内部扭结，理顺面饼的肌理，逐步形成面的“肌肤感”。最后，面饼的表面如同婴儿的肌肤，细腻、温和，又富有弹性，即所谓的“温润如玉”。
+再用太极的手法仔细揉按面饼，松开面饼的内部扭结，理顺面饼的肌理，逐步形成面的"肌肤感"。最后，面饼的表面如同婴儿的肌肤，细腻、温和，又富有弹性，即所谓的"温润如玉"。
 用保鲜膜盖好，饧发30分钟左右。</p>
 
 <h3>（三）温馨提示</h3>
 <p>（1）建议使用新疆小麦粉。
-（2）以上述“主副食材比例”为基准，若面需发得多，则以此累加。
+（2）以上述"主副食材比例"为基准，若面需发得多，则以此累加。
 （3）此方法和好的面，可以用来做拉面、炮仗面、面片、裤带面和饺子皮等。</p>
         </div>
 
@@ -332,7 +575,7 @@
 
 <p>南山饮食的发酵类面食制作，是以馒头面制作为基础，进一步深加工可以制作南山黄金饼等饼类的面食。</p>
 
-<p>厨者经过搭骨架、连筋、生脉、练肉、长肌肤五个步骤的操作，面粉已经从食材转化到半成品，完成第一个“生、熟、香、划、和”的提升，此处的生是“生熟”的生；第二次提升是厨者制作馒头剂子的过程，完成第二个“生、熟、香、划、和”，此处的生是“生发”的生；第三次提升是馒头上笼蒸制的过程，完成第三个“生、熟、香、划、和”，此处的生是“生命”的生，意味着一个新生命的诞生。</p>
+<p>厨者经过搭骨架、连筋、生脉、练肉、长肌肤五个步骤的操作，面粉已经从食材转化到半成品，完成第一个"生、熟、香、划、和"的提升，此处的生是"生熟"的生；第二次提升是厨者制作馒头剂子的过程，完成第二个"生、熟、香、划、和"，此处的生是"生发"的生；第三次提升是馒头上笼蒸制的过程，完成第三个"生、熟、香、划、和"，此处的生是"生命"的生，意味着一个新生命的诞生。</p>
 
 <h3>示例1：五体和面法——馒头发面制作</h3>
 <h3>（一）食材表</h3>
@@ -365,7 +608,7 @@
 （4）练肉
 再用劳宫发力，二次揉面，揉匀后饧面2分钟左右。
 （5）长肌肤
-用小鱼际向内发力揉面，将前面揉散的面收拢回来，逐步形成面的“肌肤感”。
+用小鱼际向内发力揉面，将前面揉散的面收拢回来，逐步形成面的"肌肤感"。
 在容器底部刷少许老火油，将揉好的面团翻面放入（光面朝上，利于饧发），仔细推按，松开面团的内部扭结。
 用保鲜膜盖好，饧发30分钟左右（以面团发到原来的2～3倍大即可，不可发过头）。发酵好的面，除了面团会膨发以外，保鲜膜也会鼓胀起来，好像是吹起的气球（这种程度的气感，高手才能做到，不必盲目追求）。</p>
 
@@ -384,14 +627,14 @@
 配料：安琪酵母10克，白糖20克，老火油20克，温水（40℃左右）550～580克。</p>
 
 <h3>（二）制作程序</h3>
-<p>酵母催发、面粉醒发以及五体制作的前两步都是与馒头制作一样的，从第四步“练肉”开始加入老火油继续和面，具体操作如下。
+<p>酵母催发、面粉醒发以及五体制作的前两步都是与馒头制作一样的，从第四步"练肉"开始加入老火油继续和面，具体操作如下。
 1. 练肉一次
 先在容器底部刷老火油，放入面团，再上部刷油，用拳头以揉捻的方式把面团捻开，刷油后旋转90°后对折，继续揉捻。3千克以下的面团折叠5次，3千克以上的折叠6次，用湿布或锅盖盖好，饧面5分钟左右。
 注意：此次用油量为总油量的三分之二。
 2. 练肉二次
 再次重复前面过程，将油全部揉入面团，盖好后饧面3分钟左右。
 3. 长肌肤
-用小鱼际向内发力揉面，将前面揉散的面收拢回来，逐步形成面的“肌肤感”。
+用小鱼际向内发力揉面，将前面揉散的面收拢回来，逐步形成面的"肌肤感"。
 将揉好的面团翻面放入（光面朝上，利于饧发），仔细推按，松开面团的内部扭结，用保鲜膜盖好饧发30分钟左右（以面团发到原来的2～3倍大即可，不可发过头了）。
 至此，饼类发面已经准备好了，可以根据需要制作相应的食品。</p>
         </div>
@@ -401,10 +644,10 @@
 <p>五行汤是南山饮食的基础做法，作用是祛邪扶正，阴阳平补，性味中和。其配伍理路和方法是诸多南山饮食出品的先决条件。</p>
 
 <h3>（一）基本理路</h3>
-<p>五行汤的配伍理路依据中医五行理论，按木、火、土、金、水分类，依据“五色”搭配食材，即主材要分五色，绿、红、黄、白、黑，烹饪者根据时令和地域进行搭配。</p>
+<p>五行汤的配伍理路依据中医五行理论，按木、火、土、金、水分类，依据"五色"搭配食材，即主材要分五色，绿、红、黄、白、黑，烹饪者根据时令和地域进行搭配。</p>
 
 <h3>（二）形制和体量</h3>
-<p>以主食为“君”决定食材的改刀。五行汤一般是作为副食来与主食配合的，为保证烹饪过程中“众缘和合”及“上下同欲”（出自《孙子兵法·谋攻》），食材的改刀要以主食为基准，从形制和体量两个方面来保障。
+<p>以主食为"君"决定食材的改刀。五行汤一般是作为副食来与主食配合的，为保证烹饪过程中"众缘和合"及"上下同欲"（出自《孙子兵法·谋攻》），食材的改刀要以主食为基准，从形制和体量两个方面来保障。
 形制是指食材改刀的形状，基本的有片、条、丁、粒等，要与主食相适应。体量是指食材改刀后的单体大小和分量。例如，要烹饪五行汤面片，因为面片是长方形的，那么配菜食材就要切成长方形的片状，大小和分量要与面片基本一致。</p>
 
 <h3>（三）烹饪要点</h3>
@@ -414,7 +657,7 @@
 
 <h3>示例：南山饮食——五行汤</h3>
 <h3>（一）食材表</h3>
-<p>主料：青色选小油菜，红色选番茄，黄色选土豆，白色选豆腐，黑色选蘑菇。以上五种食材分量等同备料。黑色的菜一般是菌类，菌类不论自身颜色，五行色都是“黑”。
+<p>主料：青色选小油菜，红色选番茄，黄色选土豆，白色选豆腐，黑色选蘑菇。以上五种食材分量等同备料。黑色的菜一般是菌类，菌类不论自身颜色，五行色都是"黑"。
 佐料：生姜、香菜、酱油、盐、清油、花椒油、辣椒油各适量。</p>
 
 <h3>（二）食材准备</h3>
@@ -434,12 +677,12 @@
 
         <div id="c8" class="content">
 <h2>老火汤做法</h2>
-<p>老火汤是南山饮食系统中的甘草，实乃食中“国老中之国老”。老火汤熬好了，可以任意搭配菜品。有老火汤的加入，菜品质量直线上升。老火汤配方很多，先介绍几种，原理和程序掌握后，再考虑熟能生巧。</p>
+<p>老火汤是南山饮食系统中的甘草，实乃食中"国老中之国老"。老火汤熬好了，可以任意搭配菜品。有老火汤的加入，菜品质量直线上升。老火汤配方很多，先介绍几种，原理和程序掌握后，再考虑熟能生巧。</p>
 
 <h3>示例：南山饮食——南山老火汤</h3>
 <h3>（一）配方</h3>
 <p>1. 五行老火汤
-按照五行五色配菜熬制老火汤，按照前面“南山饮食——五行汤”做好五行汤，然后炖煮3小时以上即可。
+按照五行五色配菜熬制老火汤，按照前面"南山饮食——五行汤"做好五行汤，然后炖煮3小时以上即可。
 
 2. 山药汤
 鲜山药500克，土黄豆100克（提前泡24小时以上），当季番茄300克（可用番茄丁或番茄酱，不放也可），生姜50克，野生党参50克，纯净水5000毫升。
@@ -464,7 +707,7 @@
 3. 改小火，盖上锅盖炖煮3个小时。</p>
 
 <h3>（四）温馨提示</h3>
-<p>1. 老火汤各种食材的改刀，要根据主食的形制和体量，即“君主臣辅，同气相求”。具体要点参见“南山饮食——五行汤”食谱。
+<p>1. 老火汤各种食材的改刀，要根据主食的形制和体量，即"君主臣辅，同气相求"。具体要点参见"南山饮食——五行汤"食谱。
 2. 党参、黄芪、当归等中药材也可以不放。
 3. 山药要用铁棍山药或野生山药。
 4. 蘑菇标配版可以是草菇、白玉菇、蟹味菇、口蘑、平菇等。精致版可以用松露、松茸、羊肚菌、黑虎掌、黄菇等，用量可以自行适当调节。
@@ -475,7 +718,11 @@
         </div>
     </div>
 
+    <!-- 回到顶部按钮 -->
+    <button class="back-to-top" id="backToTop" title="回到顶部">↑</button>
+
     <script>
+        // 标签切换
         const tabs = document.querySelectorAll('.tab');
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
@@ -484,7 +731,56 @@
                 const target = tab.dataset.target;
                 document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
                 document.getElementById(target).classList.add('active');
+                // 切换标签后回到顶部
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // 滚动到当前选中标签可见位置
+                tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             });
+        });
+
+        // 阅读进度条
+        const progressBar = document.getElementById('progressBar');
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / docHeight) * 100;
+            progressBar.style.width = progress + '%';
+        });
+
+        // 回到顶部按钮
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // 夜间模式切换
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            if (document.body.classList.contains('dark')) {
+                darkModeToggle.textContent = '☀️';
+            } else {
+                darkModeToggle.textContent = '🌙';
+            }
+        });
+
+        // 字体大小调节
+        const fontDecrease = document.getElementById('fontDecrease');
+        const fontIncrease = document.getElementById('fontIncrease');
+        fontDecrease.addEventListener('click', () => {
+            document.body.classList.remove('font-large');
+            document.body.classList.add('font-small');
+        });
+        fontIncrease.addEventListener('click', () => {
+            document.body.classList.remove('font-small');
+            document.body.classList.add('font-large');
         });
     </script>
 </body>
